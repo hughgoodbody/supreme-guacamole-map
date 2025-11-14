@@ -1,24 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select Wi-Fi</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Select Wi-Fi</title>
 </head>
 <body>
-    <h1>Select a Wi-Fi Network</h1>
-    <form action="/configure" method="POST">
-        <label for="ssid">Available Networks:</label>
-        <select name="ssid" id="ssid">
-            {% for ssid in ssids %}
-                <option value="{{ ssid }}">{{ ssid }}</option>
-            {% endfor %}
-        </select>
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password">
-        <br><br>
-        <button type="submit">Connect</button>
-    </form>
+  <h1>Select a Wi-Fi Network</h1>
+
+  <p>Found {{ count }} networks.</p>
+
+  <form action="/configure" method="POST" autocomplete="off" autocapitalize="none">
+    <label for="ssid">Available Networks:</label><br>
+    <select name="ssid" id="ssid">
+      {{ ssid_options }}
+    </select>
+    <br><br>
+
+    <label for="password">Password:</label><br>
+    <input type="password" id="password" name="password" />
+    <br><br>
+
+    <button type="submit">Connect</button>
+  </form>
 </body>
 </html>
+
