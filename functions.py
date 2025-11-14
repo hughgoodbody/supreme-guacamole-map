@@ -92,79 +92,79 @@ def _show():
 def parse_chunk(chunk_json):
     try:
         for entry in chunk_json:
-        icao = entry.get('icaoId')
-        idx = data.find(data.leds, 'code', icao)
-        if idx == -1:
-            continue
-        ap = data.leds[idx]
+            icao = entry.get('icaoId')
+            idx = data.find(data.leds, 'code', icao)
+            if idx == -1:
+                continue
+            ap = data.leds[idx]
     
-        # ---------- Visibility (meters) ----------
-        vis_raw = entry.get('visib')
-        if vis_raw is None:
-            visCat = 'VFR'   # UK convention: assume >10km
-        else:
-            try:
-                vis = float(vis_raw)
-            except:
-                vis = 9999
-            if vis <= 1600:
-                visCat = 'LIFR'
-            elif vis <= 4800:
-                visCat = 'IFR'
-            elif vis <= 8000:
-                visCat = 'MVFR'
+            # ---------- Visibility (meters) ----------
+            vis_raw = entry.get('visib')
+            if vis_raw is None:
+                visCat = 'VFR'   # UK convention: assume >10km
             else:
-                visCat = 'VFR'
-    
-        # ---------- Ceiling ----------
-        worst = 'VFR'
-        for c in entry.get('clouds', []) or []:
-            cover = c.get('cover','')
-            base = c.get('base',99999)
-            if cover in ('OVC','BKN'):
-                if base < 500:
-                    worst = 'LIFR'
-                elif base < 1000 and worst != 'LIFR':
-                    worst = 'IFR'
-                elif base <= 3000 and worst not in ('LIFR','IFR'):
-                    worst = 'MVFR'
-        cloudCat = worst
-    
-        # Merge
-        """if 'LIFR' in (visCat, cloudCat):
-            flightCat = 'LIFR'
-        elif 'IFR' in (visCat, cloudCat):
-            flightCat = 'IFR'
-        elif 'MVFR' in (visCat, cloudCat):
-            flightCat = 'MVFR'
-        else:
-            flightCat = 'VFR'
-            """
-        # Prefer API-provided flight conditions when available
-        flightCat = entry.get("fltCat") or "VFR"
-    
-    
-        # Lightning
-        wx = entry.get('wxString') or ""
-        lightning = (('TS' in wx and 'TSNO' not in wx) or ('LTG' in wx))
-    
-        # Wind (knots)
-        wspd = entry.get('wspd') or 0
-        wgst = entry.get('wgst') or 0
-    
-        # Update airport record
-        ap['flightCategory'] = flightCat
-        ap['lightning'] = lightning
-        ap['windSpeed'] = wspd
-        ap['windGustSpeed'] = wgst
-        ap['windGust'] = True if (ALWAYS_BLINK_FOR_GUSTS and wgst > 0) else False
-        ap['raw'] = entry.get('rawOb')
+                try:
+                    vis = float(vis_raw)
+                except:
+                    vis = 9999
+                if vis <= 1600:
+                    visCat = 'LIFR'
+                elif vis <= 4800:
+                    visCat = 'IFR'
+                elif vis <= 8000:
+                    visCat = 'MVFR'
+                else:
+                    visCat = 'VFR'
+        
+            # ---------- Ceiling ----------
+            worst = 'VFR'
+            for c in entry.get('clouds', []) or []:
+                cover = c.get('cover','')
+                base = c.get('base',99999)
+                if cover in ('OVC','BKN'):
+                    if base < 500:
+                        worst = 'LIFR'
+                    elif base < 1000 and worst != 'LIFR':
+                        worst = 'IFR'
+                    elif base <= 3000 and worst not in ('LIFR','IFR'):
+                        worst = 'MVFR'
+            cloudCat = worst
+        
+            # Merge
+            """if 'LIFR' in (visCat, cloudCat):
+                flightCat = 'LIFR'
+            elif 'IFR' in (visCat, cloudCat):
+                flightCat = 'IFR'
+            elif 'MVFR' in (visCat, cloudCat):
+                flightCat = 'MVFR'
+            else:
+                flightCat = 'VFR'
+                """
+            # Prefer API-provided flight conditions when available
+            flightCat = entry.get("fltCat") or "VFR"
+        
+        
+            # Lightning
+            wx = entry.get('wxString') or ""
+            lightning = (('TS' in wx and 'TSNO' not in wx) or ('LTG' in wx))
+        
+            # Wind (knots)
+            wspd = entry.get('wspd') or 0
+            wgst = entry.get('wgst') or 0
+        
+            # Update airport record
+            ap['flightCategory'] = flightCat
+            ap['lightning'] = lightning
+            ap['windSpeed'] = wspd
+            ap['windGustSpeed'] = wgst
+            ap['windGust'] = True if (ALWAYS_BLINK_FOR_GUSTS and wgst > 0) else False
+            ap['raw'] = entry.get('rawOb')
     
         debug("Update:", icao, "→", flightCat, "Wind:", wspd, "Gust:", wgst, "Ltg:", lightning)
     
-    del chunk_json
-    gc.collect()
-    return 200
+        del chunk_json
+        gc.collect()
+        return 200
 
     except Exception as e:
         debug("Fetch/Parse error:", e)
