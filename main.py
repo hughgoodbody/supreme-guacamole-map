@@ -18,9 +18,10 @@ def debug(*args):
 # ------------------------- USER CONFIG -------------------------
 
 # Hardware selection
-mapType = 'Hugh'   # change to 'Archie' for alt config
+from maptype import MAPTYPE
+#mapType = 'Hugh'   # change to 'Archie' for alt config
 
-if mapType == 'Hugh':
+if MAPTYPE == 'Hugh':
     LED_COUNT      = 100
     LED_PIN        = 1
     LED_BRIGHTNESS = 20
