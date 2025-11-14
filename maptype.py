@@ -1,0 +1,1 @@
+MAPTYPE = 'Hugh'
