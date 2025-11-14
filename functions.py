@@ -160,7 +160,7 @@ def parse_chunk(chunk_json):
             ap['windGust'] = True if (ALWAYS_BLINK_FOR_GUSTS and wgst > 0) else False
             ap['raw'] = entry.get('rawOb')
     
-        debug("Update:", icao, "→", flightCat, "Wind:", wspd, "Gust:", wgst, "Ltg:", lightning)
+            debug("Update:", icao, "→", flightCat, "Wind:", wspd, "Gust:", wgst, "Ltg:", lightning)
     
         del chunk_json
         gc.collect()
