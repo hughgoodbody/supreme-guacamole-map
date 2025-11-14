@@ -16,8 +16,6 @@ def debug(*args):
         print('[DEBUG]', *args)
 
 # ------------------------- USER CONFIG -------------------------
-SSID = 'iSpiWiFi'               # << change
-PASSWORD = 'cbx2evq.zvd!HCE!dty' # << change
 
 # Hardware selection
 mapType = 'Hugh'   # change to 'Archie' for alt config
@@ -34,7 +32,9 @@ else:
     LED_ORDER      = 'GRB'
 
 # METAR fetch settings
-API_BASE = 'https://aviationweather.gov/api/data/metar?ids={ids}&format=json'
+#API_BASE = 'https://aviationweather.gov/api/data/metar?ids={ids}&format=json'
+GITHUB_BASE = "http://hughgoodbody.github.io/pico-metar-data"
+CHUNK_COUNT = 4  # you have 4 chunks hosted
 
 # Chunking
 CHUNK_SIZE = 25
@@ -164,22 +164,6 @@ def update_display():
     else:
         show_all(COLOR_WARMWHITE)
 
-# ------------------------- WIFI -------------------------
-def connect_wifi():
-    global system_state
-    debug("WiFi: Starting connection to", SSID)
-    wlan.connect(SSID, PASSWORD)
-    system_state = STATE_WIFI_CONNECTING
-
-    for _ in range(80):
-        if wlan.isconnected():
-            debug('WiFi connected:', wlan.ifconfig())
-            return True
-        update_display()
-        wdt.feed()
-    debug("WiFi connection timeout")
-    return False
-
 # ------------------------- DIMMING -------------------------
 def maybe_dim():
     if not USE_SUNRISE_SUNSET:
@@ -201,49 +185,39 @@ def maybe_dim():
 
 # ------------------------- FETCH -------------------------
 def fetch_all_chunks():
-    """Fetch METARs in chunks; updates data.leds in-place."""
+    """Fetch METAR JSONs from GitHub Pages instead of aviationweather.gov"""
+    import urequests, gc
     return_code = 200
-    next_idx = 0
-    total = len(data.leds)
 
-    while next_idx < total:
-        end = next_idx + CHUNK_SIZE
-        if end > total:
-            end = total
-
-        ids = []
-        for i in range(next_idx, end):
-            ids.append(data.leds[i]['code'])
-        ids_str = '%2C'.join(ids)
-
-        url = API_BASE.format(ids=ids_str)
-        code = fn.fetch_and_parse(url)
-
-        if code != 200 and return_code == 200:
-            return_code = code
-
-        if code != 200:
-            update_display()
-
-        next_idx = end
-        wdt.feed()
-        gc.collect()
+    for i in range(1, CHUNK_COUNT + 1):
+        url = f"{GITHUB_BASE}/metar_chunk_{i}.json"
+        print("Fetching", url)
+        try:
+            r = urequests.get(url)
+            if r.status_code == 200:
+                code = fn.parse_chunk(r.json())  # call new parse function
+                if code != 200 and return_code == 200:
+                    return_code = code
+            else:
+                print("[DEBUG] HTTP", r.status_code, "for chunk", i)
+                return_code = r.status_code
+        except Exception as e:
+            print("[DEBUG] Chunk", i, "failed:", e)
+            return_code = 500
+        finally:
+            try:
+                r.close()
+            except:
+                pass
+            gc.collect()
 
     return return_code
 
 # ------------------------- MAIN -------------------------
 def main():
     global system_state, backoff_seconds
-
-    if not wlan.isconnected():
-        ok = connect_wifi()
-        if not ok:
-            return
-
     maybe_dim()
-
     code = fetch_all_chunks()
-
     debug('Fetch result code:', code)
     if code == 200:
         system_state = STATE_NORMAL
@@ -267,26 +241,29 @@ def main():
     update_display()
 
 # ------------------------- LOOP -------------------------
-while True:
-    try:
-        main()
-        if system_state == STATE_NORMAL:
-            # keep animation going while waiting
-            for _ in range(FETCH_INTERVAL_S):
-                update_display()
+def run():
+    """Main loop: repeatedly fetch and render METAR data."""
+    global system_state
+    while True:
+        try:
+            main()
+            if system_state == STATE_NORMAL:
+                # keep animation going while waiting
+                for _ in range(FETCH_INTERVAL_S):
+                    update_display()
+                    time.sleep(1)
+                    wdt.feed()
+            else:
                 time.sleep(1)
                 wdt.feed()
-        else:
-            time.sleep(1)
+        except Exception as e:
+            system_state = STATE_API_SERVER_ERROR
+            debug('STATE → SERVER ERROR (exception)')
+            update_display()
+            time.sleep(2)
+            if not wlan.isconnected():
+                return
             wdt.feed()
-    except Exception as e:
-        system_state = STATE_API_SERVER_ERROR
-        debug('STATE → SERVER ERROR (exception)')
-        update_display()
-        time.sleep(2)
-        if not wlan.isconnected():
-            connect_wifi()
-        wdt.feed()
-        gc.collect()
+            gc.collect()
 
 
