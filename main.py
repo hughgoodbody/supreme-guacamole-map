@@ -34,7 +34,8 @@ else:
 
 # METAR fetch settings
 #API_BASE = 'https://aviationweather.gov/api/data/metar?ids={ids}&format=json'
-GITHUB_BASE = "http://hughgoodbody.github.io/pico-metar-data"
+#GITHUB_BASE = "http://hughgoodbody.github.io/pico-metar-data"
+GITHUB_BASE = "http://www.goodbodyeffects.com"
 CHUNK_COUNT = 4  # you have 4 chunks hosted
 
 # Chunking
