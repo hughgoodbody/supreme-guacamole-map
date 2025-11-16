@@ -9,6 +9,8 @@ from argbled_lib import Argbled
 import data
 import functions as fn
 from machine import WDT
+import ota_daily
+ota_daily.ota_init_time()
 # ------------------------- DEBUG -------------------------
 DEBUG = True
 def debug(*args):
@@ -247,6 +249,7 @@ def run():
     """Main loop: repeatedly fetch and render METAR data."""
     global system_state
     while True:
+        ota_daily.ota_tick() #OTA update tick
         try:
             main()
             if system_state == STATE_NORMAL:
