@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Metar Map</title>
+    </head>
+    <body>
+        <h1>Setup</h1>
+        <p>You are connected to the Metar Map setup page.</p>
+        <p>Let&apos;s configure the wifi connection:</p>
+        <form action="/configure" method="POST" autocomplete="off" autocapitalize="none">
+            <label for="ssid">SSID:</label><br>
+            <input type="text" id="ssid" name="ssid"><br>
+            <br>
+             <label for="choosenetwork">Choose a Network:</label>             
+            <select class="form-control" name="networks" method="GET" action="/">
+            {% for network in networkList %}
+                <option value="{{ network }}">{{ network }}</option>
+            {% endfor %}
+            </select>            
+            <br>
+            <label for="password">{{ networkList }}</label><br>
+            <br>
+            <label for="password">Password:</label><br>
+            <input type="text" id="password" name="password"><br><br>
+            <button>Save</button>
+        </form>
+
+    </body>
+</html>
