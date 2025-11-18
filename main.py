@@ -87,7 +87,8 @@ COLOR_IFR_FADE    = (80, 0, 0)
 COLOR_LIFR        = (255, 0, 255)   # Magenta
 COLOR_LIFR_FADE   = (80, 0, 80)
 COLOR_CLEAR       = (0, 0, 0)
-COLOR_LIGHTNING   = (255, 255, 255) # White
+#COLOR_LIGHTNING   = (255, 255, 255) # White
+COLOR_LIGHTNING   = (255, 165, 0) # Orange for testing OTA
 COLOR_HIGH_WINDS  = (255, 255, 0)   # Yellow
 
 # Status palette (all-LEDs)
