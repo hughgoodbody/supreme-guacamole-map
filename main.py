@@ -31,7 +31,7 @@ if MAPTYPE == 'Hugh':
 else:
     LED_COUNT      = 100
     LED_PIN        = 0
-    LED_BRIGHTNESS = 75
+    LED_BRIGHTNESS = 35
     LED_ORDER      = 'RGB'
 
 # METAR fetch settings
