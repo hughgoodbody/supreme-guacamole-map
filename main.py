@@ -220,6 +220,7 @@ def fetch_all_chunks():
 
 # ------------------------- MAIN -------------------------
 def main():
+    ota_daily.ota_tick() #OTA update tick
     global system_state, backoff_seconds
     maybe_dim()
     code = fetch_all_chunks()
@@ -249,8 +250,7 @@ def main():
 def run():
     """Main loop: repeatedly fetch and render METAR data."""
     global system_state
-    while True:
-        ota_daily.ota_tick() #OTA update tick
+    while True:        
         try:
             main()
             if system_state == STATE_NORMAL:
