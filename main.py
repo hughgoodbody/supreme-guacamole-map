@@ -32,7 +32,7 @@ else:
     LED_COUNT      = 100
     LED_PIN        = 0
     LED_BRIGHTNESS = 75
-    LED_ORDER      = 'GRB'
+    LED_ORDER      = 'RGB'
 
 # METAR fetch settings
 #API_BASE = 'https://aviationweather.gov/api/data/metar?ids={ids}&format=json'
