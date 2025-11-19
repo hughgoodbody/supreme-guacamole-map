@@ -6,7 +6,7 @@ network.WLAN(network.AP_IF).active(False)
 network.WLAN(network.STA_IF).active(False)
 utime.sleep_ms(200)
 
-AP_NAME        = "pi-pico"
+AP_NAME        = "WEATHER_MAP"
 AP_DOMAIN      = "weathermap.setup"       # not a real domain
 WIFI_FILE      = "wifi.json"
 
