@@ -1,0 +1,7 @@
+{
+  "brightness": 20,
+  "dim_start_hour": 21,
+  "dim_brightness": 0.5,
+  "bright_start_hour" : 7,
+  "dimming_active" : True
+}
