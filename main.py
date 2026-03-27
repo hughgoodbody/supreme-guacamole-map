@@ -268,7 +268,9 @@ def run():
             update_display()
             time.sleep(2)
             if not wlan.isconnected():
-                return
+                import machine
+                machine.reset()
+                #return
             wdt.feed()
             gc.collect()
 
