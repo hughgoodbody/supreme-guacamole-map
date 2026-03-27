@@ -174,9 +174,22 @@ Password: <input type="password" name="password"><br><br>
     server.run()
 
 # ---------------------------------------------------------------
-# Startup logic
-if try_connect_saved():
-    print("Wi-Fi connected — launching main.py soon…")
+# Startup logic — retry Wi-Fi for up to ~3 minutes before setup mode
+MAX_WIFI_RETRIES = 9        # 9 × ~20s timeout = ~3 minutes
+RETRY_DELAY_S    = 15       # extra pause between attempts (router recovery)
+
+connected = False
+for attempt in range(1, MAX_WIFI_RETRIES + 1):
+    print(f"Wi-Fi attempt {attempt}/{MAX_WIFI_RETRIES}…")
+    if try_connect_saved():
+        connected = True
+        break
+    if attempt < MAX_WIFI_RETRIES:
+        print(f"Waiting {RETRY_DELAY_S}s before retry…")
+        utime.sleep(RETRY_DELAY_S)
+
+if connected:
+    print("Wi-Fi connected — launching main.py…")
     try:
         import main
         if hasattr(main, "run"):
@@ -186,12 +199,13 @@ if try_connect_saved():
     except Exception as e:
         import sys
         sys.print_exception(e)
-        print("Falling back to setup mode.")
+        print("main.py crashed — falling back to setup mode.")
         try:
             os.remove(WIFI_FILE)
         except:
             pass
         setup_mode()
 else:
+    print("All Wi-Fi attempts failed — entering setup mode.")
     setup_mode()
 
