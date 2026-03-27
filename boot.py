@@ -54,7 +54,7 @@ def try_connect_saved():
         print("⚠️ wlan.connect() raised:", e)
         return False
 
-    for _ in range(40):
+    for _ in range(60):
         if wlan.isconnected():
             print("✅ Connected:", wlan.ifconfig())
             return True
